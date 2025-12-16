@@ -1,0 +1,5 @@
+{
+  "name": "QuizMaster AI",
+  "description": "A modern, local-first trivia and quiz host application. Features manual question import and AI-powered question generation using Gemini.",
+  "requestFramePermissions": []
+}
