@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SetupScreen } from './components/SetupScreen';
 import { GameScreen } from './components/GameScreen';
+import { FontController } from './components/FontController';
 import { GameConfig, AppState } from './types';
 
 function App() {
   const [appState, setAppState] = useState<AppState>(AppState.SETUP);
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
+  const [fontScale, setFontScale] = useState(1);
+
+  // Apply font scale to the root HTML element
+  // This works because Tailwind uses `rem` for sizing, which is relative to the root font size.
+  useEffect(() => {
+    // Default browser font size is usually 16px (100%)
+    // We scale it based on the state
+    document.documentElement.style.fontSize = `${fontScale * 100}%`;
+  }, [fontScale]);
 
   const handleStartGame = (config: GameConfig) => {
     setGameConfig(config);
@@ -19,6 +29,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-red-900 flex items-center justify-center overflow-hidden relative">
+      {/* Global Font Controller */}
+      <FontController scale={fontScale} onScaleChange={setFontScale} />
+
       {/* Background Patterns */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-800 via-red-900 to-red-950"></div>
       

@@ -216,22 +216,21 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
 
   const getLetter = (i: number) => String.fromCharCode(65 + i);
 
-  const getCorrectAnswerText = () => {
+  // New logic to combine Letter and Content into one string
+  const getCorrectAnswerCombined = () => {
     if (currentQuestion.type === 'text') {
-      return currentQuestion.answer;
+      return currentQuestion.answer as string;
     }
-    const ans = currentQuestion.answer;
-    if (Array.isArray(ans)) {
-      return ans.map(i => getLetter(i)).sort().join('、');
-    }
-    return typeof ans === 'number' ? getLetter(ans) : ans;
-  }
-  
-  const getCorrectAnswerContent = () => {
-    if (currentQuestion.type === 'text') return null;
     const ans = currentQuestion.answer;
     const indices = Array.isArray(ans) ? ans : [ans as number];
-    return indices.map(i => currentQuestion.options?.[i]).filter(Boolean).join('； ');
+    // Sort indices just in case
+    const sortedIndices = [...indices].sort((a, b) => a - b);
+    
+    return sortedIndices.map(i => {
+       const letter = getLetter(i);
+       const content = currentQuestion.options?.[i] || '';
+       return `${letter}、${content}`;
+    }).join('； ');
   }
 
   if (isCompleted) {
@@ -270,41 +269,60 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
            if (e.target === e.currentTarget) setShowSelector(false);
         }}>
            <div className="bg-gradient-to-br from-red-950 to-red-900 border border-amber-500/30 rounded-xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl">
-              <div className="p-4 border-b border-amber-500/20 flex justify-between items-center bg-black/20 rounded-t-xl">
+              <div className="p-4 border-b border-amber-500/20 flex justify-between items-center bg-black/20 rounded-t-xl shrink-0">
                  <h3 className="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    <LayoutGrid size={20}/> 题目快速跳转
+                    <LayoutGrid size={20}/> 题目列表
                  </h3>
                  <button onClick={() => setShowSelector(false)} className="text-amber-200 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
                     <X size={20}/>
                  </button>
               </div>
-              <div className="p-4 overflow-y-auto custom-scrollbar">
-                 <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
-                    {questions.map((q, idx) => {
-                       const status = answersState[idx];
-                       let btnClass = "bg-white/5 border-amber-500/20 text-amber-100/70 hover:bg-white/10 hover:border-amber-500/50"; 
-                       if (idx === currentIndex) {
-                          btnClass = "bg-amber-500 text-red-900 border-amber-400 font-bold shadow-lg shadow-amber-500/20 ring-2 ring-amber-300 scale-105"; 
-                       } else if (status?.isSubmitted) {
-                          btnClass = status.isCorrect 
-                            ? "bg-green-900/40 border-green-500/50 text-green-300 shadow-[0_0_10px_rgba(34,197,94,0.1)]" 
-                            : (status.isCorrect === false ? "bg-red-900/40 border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "bg-blue-900/40 border-blue-500/50 text-blue-300"); 
-                       }
+              <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-8">
+                 {/* Group questions by type */}
+                 {(['single', 'multiple', 'text'] as const).map((type) => {
+                    // Filter questions of this type and keep their original index
+                    const typeQuestions = questions
+                      .map((q, originalIndex) => ({ ...q, originalIndex }))
+                      .filter(q => q.type === type);
+                    
+                    if (typeQuestions.length === 0) return null;
 
-                       return (
-                          <button 
-                             key={q.id}
-                             onClick={() => handleJumpToQuestion(idx)}
-                             className={`aspect-square rounded-lg border flex flex-col items-center justify-center transition-all duration-200 ${btnClass}`}
-                          >
-                             <span className="text-lg font-mono font-bold">{idx + 1}</span>
-                             <span className="text-[10px] opacity-60 truncate w-full text-center px-1">
-                                {q.type === 'single' ? '单选' : q.type === 'multiple' ? '多选' : '问答'}
-                             </span>
-                          </button>
-                       );
-                    })}
-                 </div>
+                    const typeLabel = type === 'single' ? '单项选择题' : type === 'multiple' ? '多项选择题' : '问答题';
+
+                    return (
+                       <div key={type} className="animate-fade-in">
+                          <h4 className="text-amber-400 font-bold mb-4 border-l-4 border-amber-500 pl-3 flex items-center gap-2 text-sm">
+                             {typeLabel}
+                             <span className="text-xs text-amber-500/50 font-normal">共 {typeQuestions.length} 题</span>
+                          </h4>
+                          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                             {typeQuestions.map((q, idx) => {
+                                const globalIndex = q.originalIndex;
+                                const status = answersState[globalIndex];
+                                let btnClass = "bg-white/5 border-amber-500/20 text-amber-100/70 hover:bg-white/10 hover:border-amber-500/50"; 
+                                if (globalIndex === currentIndex) {
+                                   btnClass = "bg-amber-500 text-red-900 border-amber-400 font-bold shadow-lg shadow-amber-500/20 ring-2 ring-amber-300 scale-105"; 
+                                } else if (status?.isSubmitted) {
+                                   btnClass = status.isCorrect 
+                                     ? "bg-green-900/40 border-green-500/50 text-green-300 shadow-[0_0_10px_rgba(34,197,94,0.1)]" 
+                                     : (status.isCorrect === false ? "bg-red-900/40 border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "bg-blue-900/40 border-blue-500/50 text-blue-300"); 
+                                }
+
+                                return (
+                                   <button 
+                                      key={q.id}
+                                      onClick={() => handleJumpToQuestion(globalIndex)}
+                                      className={`aspect-square rounded-lg border flex flex-col items-center justify-center transition-all duration-200 ${btnClass}`}
+                                   >
+                                      {/* Display relative index (1-based index within the category) */}
+                                      <span className="text-lg font-mono font-bold">{idx + 1}</span>
+                                   </button>
+                                );
+                             })}
+                          </div>
+                       </div>
+                    );
+                 })}
               </div>
            </div>
         </div>
@@ -487,20 +505,17 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
                                     <span className="w-2 h-2 rounded-full bg-current"></span>
                                     正确答案
                                   </h3>
-                                  <div className={`font-song text-red-900 leading-relaxed ${currentQuestion.type === 'text' ? 'text-xl font-medium text-left' : 'text-3xl font-bold'}`}>
-                                    {getCorrectAnswerText()}
+                                  
+                                  {/* Combined Answer Line (Letter + Content) */}
+                                  <div className={`font-song text-red-900 leading-relaxed ${currentQuestion.type === 'text' ? 'text-xl font-medium text-left' : 'text-2xl font-bold text-left'}`}>
+                                    {getCorrectAnswerCombined()}
                                   </div>
-                                  {currentQuestion.type !== 'text' && (
-                                    <div className="text-lg text-red-800/80 mt-2 font-medium">
-                                        {getCorrectAnswerContent()}
-                                    </div>
-                                  )}
-                                  {currentQuestion.explanation && (
-                                    <div className="mt-4 pt-4 border-t border-black/5 text-slate-600 text-base leading-relaxed">
-                                        <span className="inline-block px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-xs mr-2 mb-1 align-middle">解析</span>
-                                        {currentQuestion.explanation}
-                                    </div>
-                                  )}
+
+                                  {/* Explanation Area (Replaces old content area) */}
+                                  <div className="mt-4 pt-4 border-t border-black/5 text-slate-600 text-base leading-relaxed text-left">
+                                      <span className="inline-block px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 font-bold text-s mr-2 mb-1 align-middle">解析</span>
+                                      {currentQuestion.explanation || "暂无详细解析"}
+                                  </div>
                               </div>
                           </div>
                       )}

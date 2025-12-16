@@ -61,7 +61,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
     }
   };
 
-  const handleStart = () => {
+  const handleStartGameClick = () => {
     if (parsedQuestions) {
       onStartGame({
         title,
@@ -84,18 +84,21 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
     "type": "single",
     "text": "党的二十届四中全会的主题是什么？",
     "options": ["选项A内容", "选项B内容", "选项C内容", "选项D内容"],
-    "answer": 0
+    "answer": 0,
+    "explanation": "这里填写该题目的答案解析..."
   },
   {
     "type": "multiple",
     "text": "以下属于“四个自信”的是？",
     "options": ["道路自信", "理论自信", "制度自信", "文化自信"],
-    "answer": [0, 1, 2, 3]
+    "answer": [0, 1, 2, 3],
+    "explanation": "四个自信即中国特色社会主义道路自信、理论自信、制度自信、文化自信。"
   },
   {
     "type": "text",
     "text": "简述中国式现代化的本质要求。",
-    "answer": "坚持中国共产党领导，坚持中国特色社会主义..."
+    "answer": "坚持中国共产党领导，坚持中国特色社会主义...",
+    "explanation": "中国式现代化的本质要求是：坚持中国共产党领导，坚持中国特色社会主义，实现高质量发展..."
   }
 ]`;
 
@@ -288,7 +291,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
                   重新导入
                 </Button>
                 <Button 
-                  onClick={handleStart} 
+                  onClick={handleStartGameClick} 
                   variant="gold"
                   className="flex-[2] py-4 text-xl shadow-amber-500/20"
                   icon={<Play size={24} />}
