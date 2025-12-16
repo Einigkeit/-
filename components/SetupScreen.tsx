@@ -5,17 +5,21 @@ import { Question, GameConfig } from '../types';
 
 interface SetupScreenProps {
   onStartGame: (config: GameConfig) => void;
+  initialConfig?: GameConfig | null;
 }
 
-export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame }) => {
-  const [title, setTitle] = useState('以赛促学明方向，笃行实干谋发展');
-  const [subtitle, setSubtitle] = useState('知识竞赛');
+export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialConfig }) => {
+  const [title, setTitle] = useState(initialConfig?.title || '以赛促学明方向，笃行实干谋发展');
+  const [subtitle, setSubtitle] = useState(initialConfig?.subtitle || '知识竞赛');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [titleScale, setTitleScale] = useState(1); // Scale factor for font size
+  
+  // Independent scales for title and subtitle
+  const [titleScale, setTitleScale] = useState(initialConfig?.titleScale || 1);
+  const [subtitleScale, setSubtitleScale] = useState(initialConfig?.subtitleScale || 1);
   
   const [jsonInput, setJsonInput] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [parsedQuestions, setParsedQuestions] = useState<Question[] | null>(null);
+  const [parsedQuestions, setParsedQuestions] = useState<Question[] | null>(initialConfig?.questions || null);
 
   const handleParse = () => {
     setError(null);
@@ -62,7 +66,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame }) => {
       onStartGame({
         title,
         subtitle,
-        questions: parsedQuestions
+        questions: parsedQuestions,
+        titleScale,
+        subtitleScale
       });
     }
   };
@@ -117,20 +123,38 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame }) => {
               />
              </div>
              
-             <div className="w-full mt-2">
-                <div className="flex items-center justify-between text-amber-500/60 text-xs mb-2">
-                   <span className="flex items-center gap-1"><Type size={14}/> 字体大小调整</span>
-                   <span>{Math.round(titleScale * 100)}%</span>
+             {/* Font Size Sliders */}
+             <div className="w-full grid grid-cols-2 gap-8 mt-2">
+                <div>
+                  <div className="flex items-center justify-between text-amber-500/60 text-xs mb-2">
+                     <span className="flex items-center gap-1"><Type size={14}/> 主标题大小</span>
+                     <span>{Math.round(titleScale * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="2.0" 
+                    step="0.1" 
+                    value={titleScale} 
+                    onChange={(e) => setTitleScale(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  />
                 </div>
-                <input 
-                  type="range" 
-                  min="0.5" 
-                  max="1.5" 
-                  step="0.1" 
-                  value={titleScale} 
-                  onChange={(e) => setTitleScale(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                />
+                <div>
+                  <div className="flex items-center justify-between text-amber-500/60 text-xs mb-2">
+                     <span className="flex items-center gap-1"><Type size={14}/> 副标题大小</span>
+                     <span>{Math.round(subtitleScale * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="2.0" 
+                    step="0.1" 
+                    value={subtitleScale} 
+                    onChange={(e) => setSubtitleScale(parseFloat(e.target.value))}
+                    className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  />
+                </div>
              </div>
 
             <Button onClick={() => setIsEditingTitle(false)} variant="gold" className="px-6 py-2 mt-4 w-full">
@@ -150,7 +174,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame }) => {
             </h1>
             <h2 
               className="font-bold text-amber-500/90 font-song tracking-widest"
-              style={{ fontSize: `${2.25 * titleScale}rem` }}
+              style={{ fontSize: `${2.25 * subtitleScale}rem` }}
             >
               {subtitle}
             </h2>

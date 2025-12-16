@@ -21,4 +21,6 @@ export interface GameConfig {
   title: string;
   subtitle: string;
   questions: Question[];
+  titleScale?: number;
+  subtitleScale?: number;
 }

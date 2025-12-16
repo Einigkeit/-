@@ -14,7 +14,7 @@ function App() {
 
   const handleExitGame = () => {
     setAppState(AppState.SETUP);
-    setGameConfig(null);
+    // Do not clear gameConfig here, pass it back to SetupScreen as initialConfig
   };
 
   return (
@@ -30,7 +30,7 @@ function App() {
 
       <div className="relative w-full h-full z-10 flex flex-col items-center">
         {appState === AppState.SETUP && (
-          <SetupScreen onStartGame={handleStartGame} />
+          <SetupScreen onStartGame={handleStartGame} initialConfig={gameConfig} />
         )}
 
         {appState === AppState.PLAYING && gameConfig && (
