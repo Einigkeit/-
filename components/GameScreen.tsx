@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronRight, ChevronLeft, RefreshCcw, Home, CheckCircle2, XCircle, Trophy, HelpCircle, Check, X, LayoutGrid, GripHorizontal, MoveDiagonal } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RefreshCcw, Home, CheckCircle2, XCircle, Trophy, HelpCircle, Check, X, LayoutGrid, GripHorizontal, MoveDiagonal, BookOpen } from 'lucide-react';
 import { Question, GameConfig } from '../types';
 import { Button } from './Button';
 
@@ -20,13 +20,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   
-  // Resizable Card State - Default desktop size
   const [cardSize, setCardSize] = useState({ width: 1000, height: 650 });
   const [isDraggingCard, setIsDraggingCard] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Persistent State for all questions
   const [answersState, setAnswersState] = useState<Record<number, AnswerState>>({});
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -47,9 +45,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     if (showFeedback) {
+      // Feedback window displays for 2 seconds
       timer = setTimeout(() => {
         setShowFeedback(false);
-      }, 3000);
+      }, 2000);
     }
     return () => clearTimeout(timer);
   }, [showFeedback]);
@@ -65,13 +64,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
       if (isDraggingCard) {
          const centerX = window.innerWidth / 2;
          const newWidth = Math.abs(e.clientX - centerX) * 2;
-         
          const maxWidth = window.innerWidth - 40; 
          const clampedWidth = Math.max(600, Math.min(newWidth, maxWidth)); 
          
          const availableHeight = window.innerHeight - 150;
          const areaCenterY = window.innerHeight / 2;
-         
          const newHeight = Math.abs(e.clientY - areaCenterY) * 2;
          const clampedHeight = Math.max(400, Math.min(newHeight, availableHeight));
 
@@ -182,7 +179,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
     switch(type) {
       case 'single': return '单项选择题';
       case 'multiple': return '多项选择题';
-      case 'text': return '问答题';
+      case 'text': return '简答题';
       default: return '未知题型';
     }
   }
@@ -208,11 +205,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
     return (
       <div className="max-w-3xl mx-auto w-full p-6 text-center animate-fade-in flex flex-col items-center justify-center h-full">
         <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl p-8 shadow-2xl border-2 border-amber-500/50 relative overflow-hidden w-full">
-           <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-              <div className="absolute top-10 left-10 w-4 h-4 rounded-full bg-yellow-400"></div>
-              <div className="absolute top-20 right-20 w-6 h-6 rounded-full bg-red-400"></div>
-           </div>
-
           <div className="w-24 h-24 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/50 animate-pop">
             <Trophy size={48} className="text-red-900" />
           </div>
@@ -234,7 +226,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
 
   return (
     <div ref={containerRef} className="w-full h-screen flex flex-col relative select-none overflow-hidden bg-transparent">
-      {/* Question Selector Overlay */}
       {showSelector && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in" onClick={(e) => {
            if (e.target === e.currentTarget) setShowSelector(false);
@@ -253,10 +244,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
                     const typeQuestions = questions
                       .map((q, originalIndex) => ({ ...q, originalIndex }))
                       .filter(q => q.type === type);
-                    
                     if (typeQuestions.length === 0) return null;
-                    const typeLabel = type === 'single' ? '单项选择题' : type === 'multiple' ? '多项选择题' : '问答题';
-
+                    const typeLabel = type === 'single' ? '单项选择题' : type === 'multiple' ? '多项选择题' : '简答题';
                     return (
                        <div key={type} className="animate-fade-in">
                           <h4 className="text-amber-400 font-bold mb-4 border-l-4 border-amber-500 pl-3 flex items-center gap-2 text-sm">
@@ -275,7 +264,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
                                      ? "bg-green-900/40 border-green-500/50 text-green-300" 
                                      : (status.isCorrect === false ? "bg-red-900/40 border-red-500/50 text-red-300" : "bg-blue-900/40 border-blue-500/50 text-blue-300"); 
                                 }
-
                                 return (
                                    <button 
                                       key={q.id}
@@ -295,14 +283,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
         </div>
       )}
 
-      {/* Main Content Area */}
       <div className="flex-1 flex items-center justify-center relative min-h-0 w-full overflow-hidden p-6 z-10">
           <div 
             style={{ width: cardSize.width, height: cardSize.height }}
             className="bg-gradient-to-b from-slate-50 to-red-50 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] flex flex-col relative border border-red-900/10"
           >
-              <div className="absolute inset-0 opacity-[0.03] pointer-events-none rounded-3xl" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")` }}></div>
-
               <div className="flex-1 flex flex-col overflow-hidden p-4">
                  <div className="flex justify-center shrink-0 pt-6 pb-4">
                     <div className={`pl-5 pr-7 py-2 rounded-full font-bold shadow-sm flex items-center gap-3 border relative overflow-hidden group scale-tag ${
@@ -351,8 +336,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
                                   stateClass = "border border-slate-300 bg-slate-100 opacity-80"; 
                                   circleClass = "border-slate-400 bg-slate-400 text-white";
                               } else {
-                                  stateClass = "border border-slate-100 bg-slate-50 text-slate-300 opacity-40";
-                                  circleClass = "border-slate-200 text-slate-300";
+                                  // Improved visibility for unselected items after submission
+                                  stateClass = "border border-slate-200 bg-white text-slate-500 opacity-75 grayscale-[0.5]";
+                                  circleClass = "border-slate-300 text-slate-400 bg-slate-50";
                               }
                             } else if (isSelected) {
                               stateClass = "border-2 border-amber-500 bg-amber-50 text-amber-900 font-bold shadow-xl transform scale-[1.02]";
@@ -400,22 +386,61 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
 
                       {isSubmitted && (
                           <div className="w-full animate-slide-up pb-4 mt-8">
-                              <div className={`p-8 rounded-3xl border-l-[10px] shadow-xl relative overflow-hidden ${isCorrect === false ? 'bg-red-50 border-l-red-500 border-red-200' : 'bg-amber-50 border-l-amber-500 border-amber-200'} border`}>
-                                  <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-                                    {isCorrect === false ? <XCircle size={100} className="text-red-500"/> : <CheckCircle2 size={100} className="text-amber-500"/>}
+                              {currentQuestion.type !== 'text' ? (
+                                <div className={`p-8 rounded-3xl border-l-[10px] shadow-xl relative overflow-hidden ${isCorrect === false ? 'bg-red-50 border-l-red-500 border-red-200' : 'bg-amber-50 border-l-amber-500 border-amber-200'} border`}>
+                                    <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+                                      {isCorrect === false ? <XCircle size={100} className="text-red-500"/> : <CheckCircle2 size={100} className="text-amber-500"/>}
+                                    </div>
+                                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                      <span className="w-2.5 h-2.5 rounded-full bg-current"></span>
+                                      正确答案 & 解析
+                                    </h3>
+                                    <div className={`font-song text-red-900 leading-relaxed mb-4 scale-answer font-bold`}>
+                                      {getCorrectAnswerCombined()}
+                                    </div>
+                                    <div className="pt-5 border-t border-black/5 text-slate-600 text-left scale-detail leading-relaxed">
+                                        <span className="inline-block px-3 py-1 rounded-lg bg-slate-200 text-slate-800 font-bold text-[0.7em] mr-3 mb-2 align-middle">详细解析</span>
+                                        <div className="whitespace-pre-wrap">{currentQuestion.explanation || "该题目暂无详细解析内容。"}</div>
+                                    </div>
+                                </div>
+                              ) : (
+                                // Beautified Explanation for Text questions
+                                <div className="bg-amber-50/80 rounded-3xl border border-amber-200 shadow-lg p-1 relative overflow-hidden">
+                                  <div className="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+                                  <div className="border border-dashed border-amber-300 rounded-2xl p-8 bg-white/60">
+                                    <div className="flex items-center gap-3 mb-6">
+                                      <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center text-white shadow-md">
+                                        <BookOpen size={24} />
+                                      </div>
+                                      <div>
+                                        <h3 className="text-lg font-bold text-amber-900 font-song">参考答案与解析</h3>
+                                        <div className="h-1 w-16 bg-amber-500/30 rounded-full mt-1"></div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="scale-detail text-red-950 font-song leading-[1.8] text-justify space-y-4">
+                                      <div className="relative pl-4">
+                                        <span className="absolute left-0 top-0 text-amber-500 font-serif text-5xl opacity-20 -translate-x-4 -translate-y-2 select-none">“</span>
+                                        <div className="whitespace-pre-wrap">
+                                          {currentQuestion.explanation || currentQuestion.answer || "暂无详细解析内容。"}
+                                        </div>
+                                        <div className="flex justify-end mt-2">
+                                          <span className="text-amber-500 font-serif text-5xl opacity-20 translate-y-4 select-none">”</span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="mt-8 pt-6 border-t border-amber-100 flex justify-between items-center opacity-40">
+                                      <span className="text-xs italic text-amber-900 font-song">知识竞赛参考资料</span>
+                                      <div className="flex gap-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                                      </div>
+                                    </div>
                                   </div>
-                                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-current"></span>
-                                    正确答案 & 解析
-                                  </h3>
-                                  <div className={`font-song text-red-900 leading-relaxed mb-4 scale-answer ${currentQuestion.type === 'text' ? 'font-medium' : 'font-bold'}`}>
-                                    {getCorrectAnswerCombined()}
-                                  </div>
-                                  <div className="pt-5 border-t border-black/5 text-slate-600 text-left scale-detail leading-relaxed">
-                                      <span className="inline-block px-3 py-1 rounded-lg bg-slate-200 text-slate-800 font-bold text-[0.7em] mr-3 mb-2 align-middle">详细解析</span>
-                                      {currentQuestion.explanation || "该题目暂无详细解析内容。"}
-                                  </div>
-                              </div>
+                                </div>
+                              )}
                           </div>
                       )}
                  </div>
@@ -430,7 +455,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
           </div>
 
            {showFeedback && isCorrect !== null && (
-            <div className={`absolute bottom-28 left-1/2 -translate-x-1/2 px-10 py-5 rounded-2xl flex items-center justify-center gap-5 animate-slide-up z-50 shadow-2xl backdrop-blur-xl border border-white/20 min-w-[350px] ${
+            <div className={`fixed bottom-32 left-1/2 -translate-x-1/2 px-10 py-5 rounded-2xl flex items-center justify-center gap-5 z-[150] shadow-2xl backdrop-blur-xl border border-white/20 min-w-[350px] animate-slide-up-centered ${
               isCorrect ? 'bg-green-600/95 text-white' : 'bg-red-600/95 text-white'
             }`}>
               <div className="p-2 bg-white/20 rounded-full">
@@ -441,9 +466,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
           )}
       </div>
 
-      {/* Enhanced Footer Controls */}
       <div className="shrink-0 relative z-20 h-28 w-full flex items-center justify-center gap-4 pb-6 px-10 bg-gradient-to-t from-red-950/90 to-transparent">
-          
           <div className="flex items-center gap-3">
             <Button 
                 onClick={onExit} 
@@ -454,7 +477,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
                 <Home size={20} />
                 <span>主页</span>
             </Button>
-
             <Button 
                 onClick={handlePrev} 
                 variant="secondary"
@@ -466,15 +488,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({ config, onExit }) => {
             </Button>
           </div>
 
-          <div className="flex-1 max-w-xl">
+          <div className="flex-1 max-xl:max-w-md max-w-xl">
               {!isSubmitted ? (
                  <Button 
-                    onClick={currentQuestion.type === 'text' ? () => updateCurrentState({ isSubmitted: true }) : handleSubmit} 
+                    onClick={currentQuestion.type === 'text' ? () => updateCurrentState({ isSubmitted: true, isCorrect: null }) : handleSubmit} 
                     variant="gold"
                     disabled={currentQuestion.type !== 'text' && selectedOptions.length === 0}
                     className="w-full h-14 text-xl rounded-2xl shadow-xl shadow-amber-500/20 font-song font-bold tracking-[0.2em] border-2 border-amber-300 hover:scale-[1.02] transition-transform"
                  >
-                    {currentQuestion.type === 'text' ? '揭晓答案' : '确认提交'}
+                    {currentQuestion.type === 'text' ? '揭晓解析' : '确认提交'}
                  </Button>
               ) : (
                 <Button 

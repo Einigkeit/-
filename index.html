@@ -25,7 +25,7 @@
             },
             animation: {
               'fade-in': 'fadeIn 0.5s ease-out',
-              'slide-up': 'slideUp 0.5s ease-out',
+              'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
               'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
               'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
             },
@@ -72,7 +72,7 @@
       .font-song {
         font-family: "SimSun", "Songti SC", serif;
       }
-      /* Independent font scaling classes with extended multiplier potential */
+      /* Independent font scaling classes */
       .scale-question { font-size: calc(1.875rem * var(--fs-question)); }
       .scale-option { font-size: calc(1.25rem * var(--fs-option)); }
       .scale-ui { font-size: calc(1rem * var(--fs-ui)); }
@@ -82,6 +82,15 @@
       
       .scrollbar-hide::-webkit-scrollbar { display: none; }
       .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+      /* Specialized animation for centered elements to avoid layout jitter */
+      .animate-slide-up-centered {
+        animation: slideUpCentered 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes slideUpCentered {
+        0% { transform: translate(-50%, 30px); opacity: 0; }
+        100% { transform: translate(-50%, 0); opacity: 1; }
+      }
     </style>
   <script type="importmap">
 {
@@ -97,6 +106,5 @@
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
   </body>
 </html>

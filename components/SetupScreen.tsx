@@ -13,7 +13,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
   const [subtitle, setSubtitle] = useState(initialConfig?.subtitle || '知识竞赛');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   
-  // Independent scales for title and subtitle
   const [titleScale, setTitleScale] = useState(initialConfig?.titleScale || 1);
   const [subtitleScale, setSubtitleScale] = useState(initialConfig?.subtitleScale || 1);
   
@@ -37,7 +36,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
         throw new Error("题库为空");
       }
 
-      // Basic validation
       const validQuestions: Question[] = parsed.map((q: any, idx: number) => {
         if (!q.text) throw new Error(`第 ${idx + 1} 题缺少题目内容 (text)`);
         if (q.type !== 'text' && (!q.options || !Array.isArray(q.options))) {
@@ -46,10 +44,10 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
         
         return {
           id: `q-${idx}`,
-          type: q.type || 'single', // default to single choice
+          type: q.type || 'single',
           text: q.text,
           options: q.options || [],
-          answer: q.answer, // Can be number index or string
+          answer: q.answer,
           explanation: q.explanation || ''
         };
       });
@@ -97,14 +95,13 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
   {
     "type": "text",
     "text": "简述中国式现代化的本质要求。",
-    "answer": "坚持中国共产党领导，坚持中国特色社会主义...",
-    "explanation": "中国式现代化的本质要求是：坚持中国共产党领导，坚持中国特色社会主义，实现高质量发展..."
+    "answer": "坚持中国共产党领导，坚持中国特色社会主义，实现高质量发展...",
+    "explanation": "中国式现代化的本质要求是：坚持中国共产党领导，坚持中国特色社会主义，实现高质量发展，发展全过程人民民主，丰富人民精神世界，实现全体人民共同富裕，促进人与自然和谐共生，推动构建人类命运共同体，创造人类文明新形态。"
   }
 ]`;
 
   return (
     <div className="max-w-5xl mx-auto w-full p-6 animate-fade-in flex flex-col items-center">
-      {/* Title Section */}
       <div className="mb-10 text-center relative group w-full flex flex-col items-center gap-2">
         {isEditingTitle ? (
           <div className="flex flex-col items-center gap-4 animate-pop w-full max-w-4xl bg-black/40 p-6 rounded-2xl border border-amber-500/30 backdrop-blur-md">
@@ -126,7 +123,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
               />
              </div>
              
-             {/* Font Size Sliders */}
              <div className="w-full grid grid-cols-2 gap-8 mt-2">
                 <div>
                   <div className="flex items-center justify-between text-amber-500/60 text-xs mb-2">
@@ -196,7 +192,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
         <div className="p-1 bg-gradient-to-r from-transparent via-amber-500/50 to-transparent h-px w-full"></div>
         
         <div className="p-8">
-          {/* Step 1: Import */}
           {!parsedQuestions ? (
             <div className="space-y-6 animate-slide-up">
               <div className="flex items-center justify-between">
@@ -247,7 +242,6 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ onStartGame, initialCo
               </div>
             </div>
           ) : (
-            // Step 2: Preview & Start
             <div className="space-y-8 animate-slide-up text-center">
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/50">
                 <BookOpen size={40} className="text-green-400" />
