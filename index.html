@@ -54,23 +54,34 @@
       }
     </script>
     <style>
+      :root {
+        --fs-global: 1;
+        --fs-question: 1;
+        --fs-option: 1.2;
+        --fs-ui: 1;
+        --fs-tag: 1;
+        --fs-answer: 1;
+        --fs-detail: 1;
+      }
       body {
         font-family: 'Inter', sans-serif;
         background-color: #7f1d1d;
         color: #f8fafc;
+        font-size: calc(1rem * var(--fs-global));
       }
       .font-song {
         font-family: "SimSun", "Songti SC", serif;
       }
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-      }
-      /* Hide scrollbar for IE, Edge and Firefox */
-      .scrollbar-hide {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-      }
+      /* Independent font scaling classes with extended multiplier potential */
+      .scale-question { font-size: calc(1.875rem * var(--fs-question)); }
+      .scale-option { font-size: calc(1.25rem * var(--fs-option)); }
+      .scale-ui { font-size: calc(1rem * var(--fs-ui)); }
+      .scale-tag { font-size: calc(1.125rem * var(--fs-tag)); }
+      .scale-answer { font-size: calc(1.5rem * var(--fs-answer)); }
+      .scale-detail { font-size: calc(1.125rem * var(--fs-detail)); }
+      
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
   <script type="importmap">
 {
@@ -85,7 +96,6 @@
 </script>
 </head>
   <body>
-    <script type="module" src="/index.tsx"></script>
     <div id="root"></div>
   </body>
 </html>

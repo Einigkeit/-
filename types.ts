@@ -4,10 +4,10 @@ export interface Question {
   id: string;
   type: QuestionType;
   text: string;
-  options?: string[]; // 用于选择题
-  answer: string | number | number[]; // number/number[] 代表选项索引，string 代表简答题答案
-  explanation?: string; // 答案解析
-  score?: number; // 分值
+  options?: string[];
+  answer: string | number | number[];
+  explanation?: string;
+  score?: number;
 }
 
 export enum AppState {
@@ -16,7 +16,16 @@ export enum AppState {
   FINISHED = 'FINISHED'
 }
 
-// 扩展 Setup 传递给 Game 的配置
+export interface FontScales {
+  global: number;
+  question: number;
+  option: number;
+  ui: number;
+  tag: number;
+  answer: number;
+  detail: number;
+}
+
 export interface GameConfig {
   title: string;
   subtitle: string;
